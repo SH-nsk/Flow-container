@@ -3,18 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>流量・水質測定アシスタント</title>
-    <!-- Tailwind CSS for styling -->
+    <title>流量・水質測定集計アシスタント</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Digital LCD display style */
         .lcd-display {
             font-family: 'Courier New', Courier, monospace;
             background-color: #f8fafc;
             border: 4px solid #1e293b;
         }
-        
-        /* Countdown animation */
         @keyframes pulse-red {
             0%, 100% { background-color: rgba(244, 63, 94, 0.1); }
             50% { background-color: rgba(244, 63, 94, 0.3); }
@@ -22,36 +18,11 @@
         .countdown-active {
             animation: pulse-red 1s infinite;
         }
-
-        /* Print-specific styles */
         @media print {
-            .no-print {
-                display: none !important;
-            }
-            body {
-                background-color: white !important;
-                padding: 0 !important;
-            }
-            .max-w-md {
-                max-width: 100% !important;
-                box-shadow: none !important;
-                border: none !important;
-            }
-            #history-list {
-                max-height: none !important;
-                overflow: visible !important;
-            }
-            .report-card {
-                break-inside: avoid;
-                border: 1px solid #e2e8f0 !important;
-                margin-bottom: 1rem !important;
-                padding: 1rem !important;
-            }
-        }
-
-        /* UI elements smoothness */
-        .transition-all {
-            transition: all 0.2s ease-in-out;
+            .no-print { display: none !important; }
+            body { background-color: white !important; padding: 0 !important; }
+            .max-w-md { max-width: 100% !important; box-shadow: none !important; border: none !important; }
+            .location-group { break-inside: avoid; border: 1px solid #ccc !important; padding: 1rem !important; margin-bottom: 2rem !important; }
         }
     </style>
 </head>
@@ -60,39 +31,39 @@
     <div class="max-w-md mx-auto bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200">
         <!-- Header -->
         <div class="bg-slate-800 text-white p-4 text-center">
-            <h1 class="text-xl font-bold">流量 & 水質調査記録</h1>
-            <p class="text-[10px] opacity-70 mt-1 no-print">Field Survey Report Assistant</p>
+            <h1 class="text-xl font-bold">流量 & 水質調査アシスタント</h1>
+            <p class="text-[10px] opacity-70 mt-1 no-print">複数測定・平均算出・CSV/PDF対応</p>
         </div>
 
         <div class="p-5 space-y-6">
-            <!-- Data Entry Section (Hidden in print) -->
+            <!-- Data Entry (No Print) -->
             <div class="grid grid-cols-2 gap-3 no-print">
                 <div class="col-span-2">
-                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">地点名</label>
-                    <input type="text" id="location-name" placeholder="例: A地点 排水口" class="w-full border-b-2 border-slate-200 focus:border-blue-500 outline-none py-1 transition-all">
+                    <label class="text-xs font-bold text-slate-500 uppercase">地点名</label>
+                    <input type="text" id="location-name" placeholder="例: A地点" class="w-full border-b-2 border-slate-200 focus:border-blue-500 outline-none py-1">
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">水温 (℃)</label>
-                    <input type="number" id="temp" step="0.1" placeholder="20.5" class="w-full border-b-2 border-slate-200 focus:border-blue-500 outline-none py-1 transition-all">
+                    <label class="text-xs font-bold text-slate-500 uppercase">水温 (℃)</label>
+                    <input type="number" id="temp" step="0.1" class="w-full border-b-2 border-slate-200 focus:border-blue-500 outline-none py-1">
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">pH</label>
-                    <input type="number" id="ph" step="0.01" placeholder="7.00" class="w-full border-b-2 border-slate-200 focus:border-blue-500 outline-none py-1 transition-all">
+                    <label class="text-xs font-bold text-slate-500 uppercase">pH</label>
+                    <input type="number" id="ph" step="0.01" class="w-full border-b-2 border-slate-200 focus:border-blue-500 outline-none py-1">
                 </div>
                 <div class="col-span-2">
-                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">EC (mS/m)</label>
-                    <input type="number" id="ec" step="0.1" placeholder="15.0" class="w-full border-b-2 border-slate-200 focus:border-blue-500 outline-none py-1 transition-all">
+                    <label class="text-xs font-bold text-slate-500 uppercase">EC (mS/m)</label>
+                    <input type="number" id="ec" step="0.1" class="w-full border-b-2 border-slate-200 focus:border-blue-500 outline-none py-1">
                 </div>
                 <div class="col-span-2">
-                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">備考</label>
-                    <textarea id="notes" rows="2" placeholder="現場の状況など" class="w-full border-2 border-slate-100 rounded-lg p-2 text-sm focus:border-blue-500 outline-none transition-all"></textarea>
+                    <label class="text-xs font-bold text-slate-500 uppercase">備考</label>
+                    <textarea id="notes" rows="1" class="w-full border-2 border-slate-100 rounded-lg p-2 text-sm focus:border-blue-500 outline-none"></textarea>
                 </div>
             </div>
 
-            <!-- Stopwatch Section (Hidden in print) -->
-            <div class="space-y-4 no-print">
+            <!-- Stopwatch (No Print) -->
+            <div class="space-y-4 no-print border-t pt-4">
                 <div id="lcd-container" class="lcd-display rounded-2xl p-6 text-center relative">
-                    <div id="timer-label" class="text-xs font-bold text-slate-400 mb-1 uppercase tracking-widest">Stopped</div>
+                    <div id="timer-label" class="text-xs font-bold text-slate-400 mb-1 uppercase">Stopped</div>
                     <div id="timer-display" class="text-5xl font-bold text-slate-800">00:00.00</div>
                     <div id="countdown-overlay" class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-90 rounded-2xl hidden z-10">
                         <span id="countdown-value" class="text-6xl font-black text-rose-500">5</span>
@@ -100,106 +71,82 @@
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
-                    <button id="start-btn" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 rounded-xl shadow-md active:scale-95 transition-all">
-                        スタート
-                    </button>
-                    <button id="stop-btn" class="bg-rose-600 hover:bg-rose-700 text-white font-bold py-4 rounded-xl shadow-md active:scale-95 transition-all disabled:opacity-50" disabled>
-                        ストップ
-                    </button>
+                    <button id="start-btn" class="bg-emerald-600 text-white font-bold py-4 rounded-xl shadow-md active:scale-95 transition-all">スタート</button>
+                    <button id="stop-btn" class="bg-rose-600 text-white font-bold py-4 rounded-xl shadow-md disabled:opacity-50 transition-all" disabled>ストップ</button>
                 </div>
 
-                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
-                    <div class="flex items-center justify-between mb-2">
-                        <label class="text-sm font-bold text-blue-800">タイマー計測設定</label>
-                        <input type="checkbox" id="timer-toggle" class="w-5 h-5 text-blue-600 cursor-pointer">
-                    </div>
+                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 flex items-center justify-between">
                     <div class="flex items-center space-x-2">
-                        <input type="number" id="target-seconds" value="10" min="1" class="w-16 border rounded px-2 py-1 text-center font-bold text-blue-800">
-                        <span class="text-xs text-blue-700">秒計測 (5秒待機あり)</span>
-                        <button id="reset-btn" class="ml-auto text-xs bg-slate-200 hover:bg-slate-300 text-slate-600 px-3 py-1 rounded-md font-bold transition-all">リセット</button>
+                        <input type="number" id="target-seconds" value="10" class="w-12 border rounded text-center font-bold">
+                        <span class="text-xs text-blue-700">秒計測</span>
+                        <input type="checkbox" id="timer-toggle" class="w-4 h-4">
                     </div>
+                    <button id="reset-btn" class="text-xs bg-slate-200 px-3 py-1 rounded font-bold hover:bg-slate-300">リセット</button>
                 </div>
             </div>
 
-            <!-- Calculation Section (Hidden in print) -->
+            <!-- Calculation (No Print) -->
             <div id="calc-section" class="hidden no-print space-y-4 border-t pt-4">
                 <div class="flex space-x-2">
-                    <input type="number" id="water-volume" step="0.001" placeholder="採取水量 (L)" class="flex-1 border-2 border-slate-200 rounded-lg px-3 py-2 text-lg outline-none focus:border-blue-400 transition-all">
-                    <button id="calc-btn" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700">計算</button>
+                    <input type="number" id="water-volume" step="0.001" placeholder="採取量 (L)" class="flex-1 border-2 border-slate-200 rounded-lg px-3 py-2 text-lg outline-none">
+                    <button id="calc-btn" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold">計算</button>
                 </div>
-                <div id="result-card" class="hidden bg-emerald-600 text-white p-4 rounded-xl shadow-inner text-center">
-                    <div class="text-xs opacity-80 uppercase font-bold tracking-widest">算出流量</div>
+                <div id="result-card" class="hidden bg-emerald-600 text-white p-4 rounded-xl text-center">
                     <div class="text-4xl font-black"><span id="flow-rate">0.00</span> <small class="text-lg">L/min</small></div>
-                    <button id="save-btn" class="mt-3 w-full bg-white text-emerald-700 py-2 rounded-lg font-bold text-sm hover:bg-emerald-50 transition-colors">
-                        履歴に保存
-                    </button>
+                    <button id="save-btn" class="mt-3 w-full bg-white text-emerald-700 py-2 rounded-lg font-bold text-sm hover:bg-emerald-50">計測結果を記録する</button>
                 </div>
             </div>
 
-            <!-- History and Report Section -->
-            <div class="space-y-3">
+            <!-- History Section -->
+            <div class="space-y-4">
                 <div class="flex items-center justify-between no-print">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">保存された記録</h3>
-                    <button onclick="window.print()" class="text-xs bg-slate-800 text-white px-3 py-1 rounded hover:bg-slate-700 transition-colors shadow-sm">
-                        PDF出力 / 印刷
-                    </button>
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">地点別データ集計</h3>
+                    <div class="flex space-x-1">
+                        <button id="print-all-btn" class="text-[10px] bg-slate-800 text-white px-3 py-1 rounded hover:bg-slate-700">PDF出力</button>
+                        <button id="csv-all-btn" class="text-[10px] bg-slate-600 text-white px-3 py-1 rounded hover:bg-slate-500">CSV出力</button>
+                    </div>
                 </div>
                 
-                <!-- Report Title (Visible only in print) -->
                 <div class="hidden print:block border-b-2 border-slate-800 mb-6 pb-2">
-                    <h2 class="text-2xl font-bold text-slate-800">流量・水質調査報告書</h2>
+                    <h2 class="text-2xl font-bold">流量・水質調査報告書</h2>
                     <p id="print-date" class="text-sm text-slate-500 mt-1"></p>
                 </div>
 
-                <!-- Record List -->
-                <div id="history-list" class="space-y-4 max-h-96 overflow-y-auto pr-1 pb-4">
-                    <p class="text-center text-slate-400 text-xs py-8 no-print">記録はありません</p>
+                <!-- Grouped Content -->
+                <div id="history-groups" class="space-y-8 pb-10">
+                    <p id="no-data-msg" class="text-center text-slate-400 text-xs py-8">計測データはありません</p>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // --- AUDIO SYSTEM ---
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
         function playSound(type) {
             if (audioCtx.state === 'suspended') audioCtx.resume();
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            
+            osc.connect(gain); gain.connect(audioCtx.destination);
             if (type === 'start') {
-                // Short high beep
-                osc.type = 'sine';
                 osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
                 gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.2);
             } else {
-                // Longer flat beep
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(440, audioCtx.currentTime); 
+                osc.type = 'square'; osc.frequency.setValueAtTime(440, audioCtx.currentTime); 
                 gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
                 gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.5);
             }
-            osc.start();
-            osc.stop(audioCtx.currentTime + (type === 'start' ? 0.2 : 0.5));
+            osc.start(); osc.stop(audioCtx.currentTime + (type === 'start' ? 0.2 : 0.5));
         }
 
-        // --- TIMER STATE ---
         let startTime, elapsedTime = 0, timerInterval, isRunning = false;
-        
+        let allData = {}; // { locationName: [records] }
+
         const display = document.getElementById('timer-display');
-        const timerLabel = document.getElementById('timer-label');
         const startBtn = document.getElementById('start-btn');
         const stopBtn = document.getElementById('stop-btn');
         const resetBtn = document.getElementById('reset-btn');
-        const countdownOverlay = document.getElementById('countdown-overlay');
-        const countdownValue = document.getElementById('countdown-value');
-        const calcSection = document.getElementById('calc-section');
-        const resultCard = document.getElementById('result-card');
-        const historyList = document.getElementById('history-list');
+        const historyGroups = document.getElementById('history-groups');
 
         function formatTime(ms) {
             const m = Math.floor(ms / 60000);
@@ -215,23 +162,19 @@
 
             if (useTimer) {
                 startBtn.disabled = true;
-                countdownOverlay.classList.remove('hidden');
-                document.getElementById('lcd-container').classList.add('countdown-active');
+                document.getElementById('countdown-overlay').classList.remove('hidden');
                 for (let i = 5; i > 0; i--) {
-                    countdownValue.textContent = i;
+                    document.getElementById('countdown-value').textContent = i;
                     await new Promise(r => setTimeout(r, 1000));
                 }
-                countdownOverlay.classList.add('hidden');
-                document.getElementById('lcd-container').classList.remove('countdown-active');
+                document.getElementById('countdown-overlay').classList.add('hidden');
             }
 
             isRunning = true;
             playSound('start');
             startTime = Date.now() - elapsedTime;
-            startBtn.disabled = true;
-            stopBtn.disabled = false;
-            timerLabel.textContent = "Running";
-            timerLabel.classList.add('text-emerald-500');
+            startBtn.disabled = true; stopBtn.disabled = false;
+            document.getElementById('timer-label').textContent = "Running";
 
             timerInterval = setInterval(() => {
                 elapsedTime = Date.now() - startTime;
@@ -249,14 +192,11 @@
             clearInterval(timerInterval);
             isRunning = false;
             playSound('stop');
-            startBtn.disabled = false;
-            stopBtn.disabled = true;
-            timerLabel.textContent = "Finished";
-            timerLabel.classList.replace('text-emerald-500', 'text-rose-500');
-            calcSection.classList.remove('hidden');
+            startBtn.disabled = false; stopBtn.disabled = true;
+            document.getElementById('timer-label').textContent = "Finished";
+            document.getElementById('calc-section').classList.remove('hidden');
         }
 
-        // --- BUTTON EVENTS ---
         startBtn.addEventListener('click', startFlowMeasurement);
         stopBtn.addEventListener('click', stopFlowMeasurement);
         
@@ -264,71 +204,159 @@
             if (isRunning) stopFlowMeasurement();
             elapsedTime = 0;
             display.textContent = "00:00.00";
-            timerLabel.textContent = "Ready";
-            timerLabel.classList.remove('text-rose-500', 'text-emerald-500');
-            calcSection.classList.add('hidden');
-            resultCard.classList.add('hidden');
+            document.getElementById('timer-label').textContent = "Ready";
+            document.getElementById('calc-section').classList.add('hidden');
+            document.getElementById('result-card').classList.add('hidden');
         });
 
         document.getElementById('calc-btn').addEventListener('click', () => {
             const vol = parseFloat(document.getElementById('water-volume').value);
             const mins = (elapsedTime / 1000) / 60;
             if (vol > 0 && mins > 0) {
-                const flow = (vol / mins).toFixed(3);
-                document.getElementById('flow-rate').textContent = flow;
-                resultCard.classList.remove('hidden');
-            } else {
-                alert("有効な採取水量を入力してください");
+                document.getElementById('flow-rate').textContent = (vol / mins).toFixed(3);
+                document.getElementById('result-card').classList.remove('hidden');
             }
         });
 
         document.getElementById('save-btn').addEventListener('click', () => {
-            const data = {
-                loc: document.getElementById('location-name').value || "未指定地点",
+            const locName = document.getElementById('location-name').value || "未指定地点";
+            const record = {
+                id: Date.now(),
                 time: new Date().toLocaleString(),
-                temp: document.getElementById('temp').value,
-                ph: document.getElementById('ph').value,
-                ec: document.getElementById('ec').value,
+                temp: parseFloat(document.getElementById('temp').value) || null,
+                ph: parseFloat(document.getElementById('ph').value) || null,
+                ec: parseFloat(document.getElementById('ec').value) || null,
                 notes: document.getElementById('notes').value,
-                rate: document.getElementById('flow-rate').textContent,
+                rate: parseFloat(document.getElementById('flow-rate').textContent),
                 duration: formatTime(elapsedTime),
-                vol: document.getElementById('water-volume').value
+                vol: document.getElementById('water-volume').value,
+                use: true
             };
 
-            const card = document.createElement('div');
-            card.className = "report-card bg-white border border-slate-200 rounded-lg p-4 shadow-sm text-sm space-y-2";
-            card.innerHTML = `
-                <div class="flex justify-between font-bold text-slate-800 border-b border-slate-200 pb-1">
-                    <span class="text-base">${data.loc}</span>
-                    <span class="text-emerald-700 text-lg">${data.rate} L/min</span>
-                </div>
-                <div class="grid grid-cols-2 text-[10px] text-slate-500 italic mb-2">
-                    <div>記録日時: ${data.time}</div>
-                    <div class="text-right text-slate-800 font-medium">計測時間: ${data.duration} (採取量: ${data.vol}L)</div>
-                </div>
-                <div class="grid grid-cols-3 gap-2 py-1">
-                    <div class="bg-blue-50 p-2 rounded border border-blue-100 text-center">
-                        <div class="text-[9px] text-blue-400 font-bold uppercase">Temp</div>
-                        <div class="text-blue-700 font-bold">${data.temp || '--'} ℃</div>
-                    </div>
-                    <div class="bg-purple-50 p-2 rounded border border-purple-100 text-center">
-                        <div class="text-[9px] text-purple-400 font-bold uppercase">pH</div>
-                        <div class="text-purple-700 font-bold">${data.ph || '--'}</div>
-                    </div>
-                    <div class="bg-amber-50 p-2 rounded border border-amber-100 text-center">
-                        <div class="text-[9px] text-amber-500 font-bold uppercase">EC (mS/m)</div>
-                        <div class="text-amber-700 font-bold">${data.ec || '--'}</div>
-                    </div>
-                </div>
-                ${data.notes ? `<div class="bg-slate-50 p-2 rounded text-xs text-slate-600 border border-slate-100 mt-2"><strong>備考:</strong> ${data.notes}</div>` : ''}
-            `;
-
-            if (historyList.querySelector('p')) historyList.innerHTML = '';
-            historyList.prepend(card);
-            resultCard.classList.add('hidden');
+            if (!allData[locName]) allData[locName] = [];
+            allData[locName].push(record);
+            renderHistory();
+            document.getElementById('result-card').classList.add('hidden');
         });
 
-        // Update current date for printing
+        function renderHistory() {
+            const keys = Object.keys(allData);
+            if (keys.length === 0) {
+                historyGroups.innerHTML = '<p id="no-data-msg" class="text-center text-slate-400 text-xs py-8">計測データはありません</p>';
+                return;
+            }
+            
+            historyGroups.innerHTML = '';
+            keys.forEach(loc => {
+                const records = allData[loc];
+                const activeRecords = records.filter(r => r.use);
+                
+                const avgRate = activeRecords.length ? (activeRecords.reduce((s, r) => s + r.rate, 0) / activeRecords.length).toFixed(3) : "0.000";
+                const avgTemp = activeRecords.filter(r=>r.temp!==null).length ? (activeRecords.reduce((s, r) => s + (r.temp || 0), 0) / activeRecords.filter(r=>r.temp!==null).length).toFixed(1) : "--";
+                const avgPh = activeRecords.filter(r=>r.ph!==null).length ? (activeRecords.reduce((s, r) => s + (r.ph || 0), 0) / activeRecords.filter(r=>r.ph!==null).length).toFixed(2) : "--";
+                const avgEc = activeRecords.filter(r=>r.ec!==null).length ? (activeRecords.reduce((s, r) => s + (r.ec || 0), 0) / activeRecords.filter(r=>r.ec!==null).length).toFixed(1) : "--";
+
+                const groupDiv = document.createElement('div');
+                groupDiv.className = "location-group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden";
+                
+                let tableRows = records.map((r, idx) => `
+                    <tr class="${r.use ? '' : 'bg-slate-50 text-slate-300'}">
+                        <td class="px-3 py-2 no-print">
+                            <input type="checkbox" ${r.use ? 'checked' : ''} onclick="toggleUse('${loc}', ${idx})">
+                        </td>
+                        <td class="px-3 py-2">${r.time.split(' ')[1]}</td>
+                        <td class="px-3 py-2 font-bold">${r.rate.toFixed(3)}</td>
+                        <td class="px-3 py-2">${r.temp || '-'}/${r.ph || '-'}/${r.ec || '-'}</td>
+                    </tr>
+                    ${r.notes ? `<tr class="${r.use ? '' : 'text-slate-300'}"><td colspan="4" class="px-3 py-1 text-[9px] italic border-b opacity-70">備考: ${r.notes}</td></tr>` : ''}
+                `).join('');
+
+                groupDiv.innerHTML = `
+                    <div class="bg-slate-100 px-4 py-2 border-b flex justify-between items-center">
+                        <h4 class="font-bold text-slate-700">${loc} <span class="text-xs font-normal text-slate-500">(${records.length}件)</span></h4>
+                        <button onclick="downloadCSV('${loc}')" class="no-print text-[9px] bg-white border border-slate-300 px-2 py-0.5 rounded shadow-sm hover:bg-slate-50">CSV</button>
+                    </div>
+                    <div class="grid grid-cols-4 gap-1 p-3 bg-emerald-50/30 border-b">
+                        <div class="text-center"><p class="text-[8px] text-emerald-600 font-bold">AVG FLOW</p><p class="text-sm font-black text-emerald-800">${avgRate}</p></div>
+                        <div class="text-center"><p class="text-[8px] text-slate-400 font-bold">AVG TEMP</p><p class="text-xs font-bold text-slate-600">${avgTemp}℃</p></div>
+                        <div class="text-center"><p class="text-[8px] text-slate-400 font-bold">AVG PH</p><p class="text-xs font-bold text-slate-600">${avgPh}</p></div>
+                        <div class="text-center"><p class="text-[8px] text-slate-400 font-bold">AVG EC</p><p class="text-xs font-bold text-slate-600">${avgEc}</p></div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-[10px] text-left">
+                            <thead class="bg-slate-50 text-slate-500 uppercase">
+                                <tr><th class="px-3 py-2 no-print w-8">採用</th><th class="px-3 py-2">時刻</th><th class="px-3 py-2">L/min</th><th class="px-3 py-2">T/pH/EC</th></tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">${tableRows}</tbody>
+                        </table>
+                    </div>
+                `;
+                historyGroups.appendChild(groupDiv);
+            });
+        }
+
+        window.toggleUse = (loc, idx) => {
+            allData[loc][idx].use = !allData[loc][idx].use;
+            renderHistory();
+        };
+
+        // CSVエクスポート用関数
+        function generateCSVBlob(locName = null) {
+            let csv = "\uFEFF地点名,採用,計測日時,流量(L/min),計測時間,採取量(L),水温(C),pH,EC(mS/m),備考\n";
+            const keys = locName ? [locName] : Object.keys(allData);
+            
+            keys.forEach(loc => {
+                allData[loc].forEach(r => {
+                    const row = [
+                        loc,
+                        r.use ? "採用" : "不採用",
+                        r.time,
+                        r.rate,
+                        r.duration,
+                        r.vol,
+                        r.temp || "",
+                        r.ph || "",
+                        r.ec || "",
+                        `"${(r.notes || "").replace(/"/g, '""')}"`
+                    ];
+                    csv += row.join(",") + "\n";
+                });
+            });
+            return new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        }
+
+        window.downloadCSV = (loc) => {
+            const blob = generateCSVBlob(loc);
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `flow_report_${loc}_${new Date().getTime()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+
+        // 全体エクスポートと印刷
+        document.getElementById('csv-all-btn').addEventListener('click', () => {
+            if (Object.keys(allData).length === 0) return;
+            const blob = generateCSVBlob();
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `flow_report_all_${new Date().getTime()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        document.getElementById('print-all-btn').addEventListener('click', () => {
+            if (Object.keys(allData).length === 0) {
+                alert("出力するデータがありません");
+                return;
+            }
+            window.print();
+        });
+
         window.onbeforeprint = () => {
             document.getElementById('print-date').textContent = `出力日時: ${new Date().toLocaleString()}`;
         };
